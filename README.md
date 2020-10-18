@@ -32,7 +32,7 @@ sudo apt install virtualbox virtualbox-ext-pack -y
 
 Run
 ```bash
-minikube start --insecure-registry "192.168.99.0/24"
+minikube start --insecure-registry "192.168.99.0/24" --vm-driver=virtualbox
 ```
 
 Enable registry
@@ -125,7 +125,7 @@ A lot of things to do it, mainly:
 * Use AWS EKS to manage k8s clusters
 * Use your own VPC
 * Enable VPC Flow logs
-* Use Application Load Balancer to expose k8s services (API service)
+* Use Application Load Balancer as ingress controller to expose k8s services (API service)
 * Use AWS Elasticache as cache system
 * Use AWS RDS as storage system. Deploy multi-az with read replicas
 * Configure backups for RDS and Elasticache

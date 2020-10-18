@@ -1,8 +1,8 @@
 API_DOMAIN ?= $(shell minikube ip)
-API_DOMAIN ?=
 REGISTRY ?= $(shell minikube ip):5000
-DOCKER_IMAGE = $(REGISTRY)/demo
+DOCKER_IMAGE = $(REGISTRY)/api-users
 VERSION ?= latest
+NAMESPACE = api-users
 
 .PHONY: default minikube build deploy tests
 
@@ -11,7 +11,7 @@ default:
 
 minikube:
 	minikube delete
-	minikube start --insecure-registry "192.168.99.0/24"
+	minikube start --insecure-registry "192.168.99.0/24" --vm-driver=virtualbox
 	minikube addons enable registry
 	kubectl get nodes
 
@@ -29,16 +29,17 @@ ifneq ($(VERSION), latest)
 	docker push $(DOCKER_IMAGE):$(VERSION)
 endif
 	curl $(REGISTRY)/v2/_catalog
-	curl $(REGISTRY)/v2/demo/tags/list
+	curl $(REGISTRY)/v2/api-users/tags/list
 
 deploy:
-	kubectl -n demo apply -f k8s/ns.yml
-	kubectl -n demo apply -f k8s/db.yml
-	DOCKER_IMAGE=$(DOCKER_IMAGE) envsubst < k8s/api.yml | kubectl -n demo apply -f -
-	sleep 20
-	kubectl -n demo get pods
+	NAMESPACE=$(NAMESPACE) envsubst < k8s/ns.yml | kubectl apply -f -
+	kubectl -n $(NAMESPACE) apply -f k8s/db.yml
+	sleep 5
+	DOCKER_IMAGE=$(DOCKER_IMAGE) envsubst < k8s/api.yml | kubectl -n $(NAMESPACE) apply -f -
+	sleep 30
+	kubectl -n $(NAMESPACE) get pods
 	sleep 40
-	curl $(API_DOMAIN):8888/users/health
+	curl $(API_DOMAIN):$(shell kubectl -n $(NAMESPACE) get svc api --output='jsonpath="{.spec.ports[0].nodePort}"' | sed s/\"//g)/users/health
 
 tests:
 	docker-compose up --build -d
