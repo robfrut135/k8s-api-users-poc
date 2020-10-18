@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+  labels:
+    app: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api
+          image: ${DOCKER_IMAGE}
+          env:
+            - name: REDIS_HOST
+              value: localhost
+            - name: MYSQL_HOST
+              value: mysql-service
+            - name: MYSQL_USER
+              value: root
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secrets
+                  key: ROOT_PASSWORD
+          ports:
+            - name: api
+              containerPort: 8080
+              protocol: TCP
+        - name: redis
+          image: redis
+          ports:
+            - name: redis
+              containerPort: 6379
+              protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  labels:
+    name: api
+    app: demo
+spec:
+  selector:
+    name: api
+  type: NodePort
+  ports:
+    - name: api
+      port: 80
+      protocol: TCP
+      targetPort: 8080
