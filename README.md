@@ -135,6 +135,7 @@ A lot of things to do it, mainly:
 * Jenkins (or other tool) to implement pipelines
 * Cross-account permissions to enable deployment actions in environment accounts
 * Proxy in front of API (envoy...)
+* Implement Authentication/Authorization in API
 * ...
 
 ### Reliability
