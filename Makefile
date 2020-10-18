@@ -34,12 +34,10 @@ endif
 deploy:
 	NAMESPACE=$(NAMESPACE) envsubst < k8s/ns.yml | kubectl apply -f -
 	kubectl -n $(NAMESPACE) apply -f k8s/db.yml
-	sleep 5
+	kubectl wait --for condition=ready --timeout 60s -n $(NAMESPACE) -l app=mysql pod
 	DOCKER_IMAGE=$(DOCKER_IMAGE) envsubst < k8s/api.yml | kubectl -n $(NAMESPACE) apply -f -
-	sleep 30
+	kubectl wait --for condition=ready --timeout 60s -n $(NAMESPACE) -l app=api-users pod
 	kubectl -n $(NAMESPACE) get pods
-	sleep 40
-	curl $(API_DOMAIN):$(shell kubectl -n $(NAMESPACE) get svc api --output='jsonpath="{.spec.ports[0].nodePort}"' | sed s/\"//g)/users/health
 
 tests:
 	docker-compose up --build -d

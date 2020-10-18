@@ -20,7 +20,11 @@ sudo mv ./kubectl /usr/local/bin/kubectl
 
 #### Install Minikube
 
-https://minikube.sigs.k8s.io/docs/start/
+```bash
+wget https://github.com/kubernetes/minikube/releases/download/v1.14.0/minikube_1.14.0-0_amd64.deb --no-check-certificate
+sudo dpkg -i minikube_1.14.0-0_amd64.deb
+rm -f minikube_1.14.0-0_amd64.deb
+```
 
 #### Install VirtualBox
 
@@ -105,6 +109,7 @@ make clean
 ## Tips
  
 ### Deployment pipeline
+
 We should use a CICD tool like Jenkins, CodePipeline, Azure DevOps... to orchestrate deployment, for instance:
 * run tests
 * build and push docker image
@@ -113,6 +118,7 @@ We should use a CICD tool like Jenkins, CodePipeline, Azure DevOps... to orchest
 * promote to next environment
  
 ### Logging
+
 Main steps:
 * We should use a monitoring tool like CloudWatch to centralize metrics
 * We should use a logging tool like CloudWatch to centralize logs
@@ -120,6 +126,7 @@ Main steps:
 * Deploy Fluentd agent as Daemon Set to collect logs inside CloudWatch 
  
 ### Move to production
+
 A lot of things to do it, mainly:
 * One AWS account per environment
 * Use AWS EKS to manage k8s clusters
@@ -139,6 +146,7 @@ A lot of things to do it, mainly:
 * ...
 
 ### Reliability
+
 * Inside K8s only deploy API, stateless service
 * We have to do frequently AWS Elasticache (redis engine) backups 
 * We have to enable AWS RDS backups and configure maintenance window

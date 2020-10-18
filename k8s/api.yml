@@ -29,6 +29,11 @@ spec:
                 secretKeyRef:
                   name: mysql-secrets
                   key: ROOT_PASSWORD
+          readinessProbe:
+            httpGet:
+              path: /users/health
+              port: 8080
+            periodSeconds: 5
           ports:
             - name: api-users
               containerPort: 8080
