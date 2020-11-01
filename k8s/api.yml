@@ -17,6 +17,7 @@ spec:
       containers:
         - name: api-users
           image: ${DOCKER_IMAGE}
+          imagePullPolicy: IfNotPresent
           env:
             - name: REDIS_HOST
               value: localhost
@@ -40,6 +41,7 @@ spec:
               protocol: TCP
         - name: redis
           image: redis
+          imagePullPolicy: IfNotPresent
           ports:
             - name: redis
               containerPort: 6379
@@ -51,11 +53,10 @@ kind: Service
 metadata:
   name: api-users
   labels:
-    name: api-users
     app: api-users
 spec:
   selector:
-    name: api-users
+    app: api-users
   type: NodePort
   ports:
     - name: api-users
